@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Report content · Kouloir</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<header><span class="logo" aria-hidden="true"></span><span class="brand">Kouloir</span></header>
+<nav aria-label="Legal pages">
+  <a href="terms.html">Terms of Use</a>
+  <a href="privacy.html">Privacy</a>
+  <a href="legal-notice.html">Legal notice</a>
+  <a href="report.html" aria-current="page">Report</a>
+  <a href="signaler.html" lang="fr">Français</a>
+</nav>
+
+<h1>Report content</h1>
+<p class="meta">For everyone, even without a Kouloir account</p>
+
+<div class="box">
+  <p><strong>Immediate danger?</strong> Call <strong>112</strong>. In France, suicidal thoughts:
+  <strong>3114</strong> (24/7). Cyberbullying: <strong>3018</strong>.</p>
+</div>
+
+<p>Have an account? The fastest way is the “•••” button on the post or reply, in the app. Otherwise, fill in
+this form: the admins receive it right away and handle it within 24 hours.</p>
+
+<form id="f" novalidate>
+  <label for="ecole">School concerned</label>
+  <input id="ecole" name="ecole" maxlength="100" placeholder="For example: HEC Paris">
+
+  <label for="raison">Reason</label>
+  <select id="raison" name="raison" required>
+    <option value="">Choose…</option>
+    <option>Threat, violence or danger</option>
+    <option>Harassment</option>
+    <option>Names or targets someone</option>
+    <option>Personal info (address, phone…)</option>
+    <option>Intimate photo, or photo of someone without consent</option>
+    <option>Involves a minor</option>
+    <option>Hate or discrimination</option>
+    <option>Infringes my rights (defamation, image rights, copyright)</option>
+    <option>Right of reply</option>
+    <option>Other</option>
+  </select>
+
+  <label for="contenu">The content</label>
+  <textarea id="contenu" name="contenu" rows="4" maxlength="1000" required
+    placeholder="Copy the text of the post or reply, with its approximate date and time."></textarea>
+
+  <label for="explication">Why it is illegal or against the rules</label>
+  <textarea id="explication" name="explication" rows="5" maxlength="2000" required></textarea>
+
+  <label for="nom">Your name</label>
+  <input id="nom" name="nom" maxlength="100" required autocomplete="name">
+
+  <label for="email">Your email (so we can reply)</label>
+  <input id="email" name="email" type="email" maxlength="200" required autocomplete="email">
+
+  <label class="check"><input id="bonnefoi" type="checkbox" required>
+    I declare in good faith that the information in this report is accurate and complete.</label>
+
+  <button type="submit" id="envoyer">Send the report</button>
+  <p id="msg" role="status" aria-live="polite"></p>
+</form>
+
+<p class="meta">Your name and email are only visible to Kouloir's admins and are never shared with the author
+of the content. See the <a href="privacy.html">privacy policy</a>. An abusive report may make you liable.</p>
+
+<footer>Kouloir · <a href="mailto:contact@kouloir.fr">contact@kouloir.fr</a></footer>
+</main>
+<script>
+(function () {
+  var URL_API = 'https://dztlmecaycfcapjilwvz.supabase.co';
+  var CLE = 'sb_publishable_dzXwmoCbEqHx5TGixpw9bQ_k9gCYo-b';
+  var f = document.getElementById('f'), msg = document.getElementById('msg'), btn = document.getElementById('envoyer');
+  function val(id) { return document.getElementById(id).value.trim(); }
+  f.addEventListener('submit', function (e) {
+    e.preventDefault();
+    msg.className = '';
+    if (!val('raison') || val('contenu').length < 3 || val('explication').length < 3 || !val('nom') || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val('email'))) {
+      msg.className = 'err'; msg.textContent = 'Please fill in every field, with a valid email.'; return;
+    }
+    if (!document.getElementById('bonnefoi').checked) {
+      msg.className = 'err'; msg.textContent = 'Please tick the good-faith declaration.'; return;
+    }
+    btn.disabled = true; msg.textContent = 'Sending…';
+    fetch(URL_API + '/rest/v1/rpc/signalement_public', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: CLE, Authorization: 'Bearer ' + CLE },
+      body: JSON.stringify({
+        p_ecole: val('ecole'), p_contenu: val('contenu'), p_raison: val('raison'),
+        p_explication: val('explication'), p_nom: val('nom'), p_email: val('email'), p_bonne_foi: true
+      })
+    }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok) throw new Error((res.j && res.j.message) || 'error');
+        f.reset();
+        msg.className = 'ok';
+        msg.textContent = 'Report received, thank you. Reference: ' + res.j + '. Keep it: we will reply to the email you gave.';
+      })
+      .catch(function (err) {
+        msg.className = 'err';
+        msg.textContent = /RATE_LIMIT/.test(String(err.message))
+          ? 'Too many reports sent. Try again in an hour, or write to contact@kouloir.fr.'
+          : 'Sending failed. Try again, or write to contact@kouloir.fr.';
+      })
+      .then(function () { btn.disabled = false; });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Signaler un contenu · Kouloir</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<header><span class="logo" aria-hidden="true"></span><span class="brand">Kouloir</span></header>
+<nav aria-label="Pages légales">
+  <a href="cgu.html">Conditions d'utilisation</a>
+  <a href="confidentialite.html">Confidentialité</a>
+  <a href="mentions-legales.html">Mentions légales</a>
+  <a href="signaler.html" aria-current="page">Signaler</a>
+  <a href="report.html" lang="en">English</a>
+</nav>
+
+<h1>Signaler un contenu</h1>
+<p class="meta">Pour tout le monde, même sans compte Kouloir</p>
+
+<div class="box">
+  <p><strong>Danger immédiat ?</strong> Appelle le <strong>17</strong> ou le <strong>112</strong>.
+  Idées suicidaires : <strong>3114</strong> (24 h/24). Cyberharcèlement : <strong>3018</strong>.</p>
+</div>
+
+<p>Tu as un compte ? Le plus rapide est le bouton « ••• » sur le post ou la réponse, dans l'application.
+Sinon, remplis ce formulaire : les administrateurs le reçoivent tout de suite et le traitent sous 24 heures.</p>
+
+<form id="f" novalidate>
+  <label for="ecole">École concernée</label>
+  <input id="ecole" name="ecole" maxlength="100" placeholder="Par exemple : HEC Paris">
+
+  <label for="raison">Motif</label>
+  <select id="raison" name="raison" required>
+    <option value="">Choisir…</option>
+    <option>Menace, violence ou danger</option>
+    <option>Harcèlement</option>
+    <option>Nomme ou vise une personne</option>
+    <option>Informations personnelles (adresse, téléphone…)</option>
+    <option>Photo intime, ou photo de quelqu'un sans son accord</option>
+    <option>Implique un mineur</option>
+    <option>Haine ou discrimination</option>
+    <option>Atteinte à mes droits (diffamation, droit à l'image, droit d'auteur)</option>
+    <option>Droit de réponse</option>
+    <option>Autre</option>
+  </select>
+
+  <label for="contenu">Le contenu en question</label>
+  <textarea id="contenu" name="contenu" rows="4" maxlength="1000" required
+    placeholder="Recopie le texte du post ou de la réponse, avec sa date et l'heure approximatives."></textarea>
+
+  <label for="explication">Pourquoi il est illégal ou contraire aux règles</label>
+  <textarea id="explication" name="explication" rows="5" maxlength="2000" required></textarea>
+
+  <label for="nom">Ton nom</label>
+  <input id="nom" name="nom" maxlength="100" required autocomplete="name">
+
+  <label for="email">Ton email (pour te répondre)</label>
+  <input id="email" name="email" type="email" maxlength="200" required autocomplete="email">
+
+  <label class="check"><input id="bonnefoi" type="checkbox" required>
+    Je déclare de bonne foi que les informations de ce signalement sont exactes et complètes.</label>
+
+  <button type="submit" id="envoyer">Envoyer le signalement</button>
+  <p id="msg" role="status" aria-live="polite"></p>
+</form>
+
+<p class="meta">Ton nom et ton email ne sont visibles que des administrateurs de Kouloir, et ne sont jamais
+transmis à l'auteur du contenu. Voir la <a href="confidentialite.html">politique de confidentialité</a>.
+Un signalement abusif peut engager ta responsabilité.</p>
+
+<footer>Kouloir · <a href="mailto:contact@kouloir.fr">contact@kouloir.fr</a></footer>
+</main>
+<script>
+(function () {
+  var URL_API = 'https://dztlmecaycfcapjilwvz.supabase.co';
+  var CLE = 'sb_publishable_dzXwmoCbEqHx5TGixpw9bQ_k9gCYo-b';
+  var f = document.getElementById('f'), msg = document.getElementById('msg'), btn = document.getElementById('envoyer');
+  function val(id) { return document.getElementById(id).value.trim(); }
+  f.addEventListener('submit', function (e) {
+    e.preventDefault();
+    msg.className = '';
+    if (!val('raison') || val('contenu').length < 3 || val('explication').length < 3 || !val('nom') || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val('email'))) {
+      msg.className = 'err'; msg.textContent = 'Remplis tous les champs, avec un email valide.'; return;
+    }
+    if (!document.getElementById('bonnefoi').checked) {
+      msg.className = 'err'; msg.textContent = 'Coche la déclaration de bonne foi.'; return;
+    }
+    btn.disabled = true; msg.textContent = 'Envoi…';
+    fetch(URL_API + '/rest/v1/rpc/signalement_public', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: CLE, Authorization: 'Bearer ' + CLE },
+      body: JSON.stringify({
+        p_ecole: val('ecole'), p_contenu: val('contenu'), p_raison: val('raison'),
+        p_explication: val('explication'), p_nom: val('nom'), p_email: val('email'), p_bonne_foi: true
+      })
+    }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok) throw new Error((res.j && res.j.message) || 'erreur');
+        f.reset();
+        msg.className = 'ok';
+        msg.textContent = 'Signalement reçu, merci. Référence : ' + res.j + '. Garde-la : nous te répondrons à l’email indiqué.';
+      })
+      .catch(function (err) {
+        msg.className = 'err';
+        msg.textContent = /RATE_LIMIT/.test(String(err.message))
+          ? 'Trop de signalements envoyés. Réessaie dans une heure, ou écris à contact@kouloir.fr.'
+          : 'L’envoi a échoué. Réessaie, ou écris à contact@kouloir.fr.';
+      })
+      .then(function () { btn.disabled = false; });
+  });
+})();
+</script>
+</body>
+</html>

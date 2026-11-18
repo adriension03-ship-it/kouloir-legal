@@ -33,3 +33,18 @@ th, td { text-align: left; vertical-align: top; padding: 10px 8px; border-bottom
 th { color: #B4B4BC; font-weight: 600; }
 .table-wrap { overflow-x: auto; }
 footer { margin-top: 48px; color: #8E8E97; font-size: 13px; }
+form { display: flex; flex-direction: column; gap: 6px; margin: 20px 0; }
+label { color: #B4B4BC; font-size: 14px; margin-top: 10px; }
+input, select, textarea {
+  font: inherit; color: #F4F4F1; background: #26262C; border: 1px solid #34343B; border-radius: 12px;
+  padding: 12px 14px; min-height: 44px; width: 100%; box-sizing: border-box;
+}
+textarea { resize: vertical; }
+input:focus, select:focus, textarea:focus { outline: 2px solid #C6FF3D; outline-offset: 1px; }
+label.check { display: flex; gap: 10px; align-items: flex-start; color: #E4E4E0; font-size: 14.5px; margin-top: 14px; }
+label.check input { width: 20px; min-height: 20px; height: 20px; margin-top: 2px; flex: none; accent-color: #C6FF3D; }
+button { font: inherit; font-weight: 700; color: #111113; background: #C6FF3D; border: 0; border-radius: 14px;
+  min-height: 48px; padding: 0 20px; margin-top: 16px; cursor: pointer; }
+button:disabled { opacity: 0.5; cursor: default; }
+#msg.ok { color: #C6FF3D; }
+#msg.err { color: #FF8A5B; }
