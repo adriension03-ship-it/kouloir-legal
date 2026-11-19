@@ -1,0 +1,148 @@
+/* Page d'accueil kouloir.fr — reprend src/theme/index.ts et l'écran « 1 · Bienvenue » */
+:root {
+  color-scheme: light;
+  --background: #111113;
+  --card: #1A1A1E;
+  --field: #26262C;
+  --border: #34343B;
+  --lime: #C6FF3D;
+  --text: #F4F4F1;
+  --text-secondary: #B4B4BC;
+  --text-muted: #8E8E97;
+  --title: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+  --body: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: linear-gradient(160deg, #C6FF3D 0%, #9BF04A 55%, #4FD27A 100%);
+  background-color: var(--lime);
+  background-attachment: fixed;
+  color: var(--background);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.5;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 48px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 40px;
+}
+.hero { flex: 1; display: flex; flex-direction: column; }
+.hero h1 { margin: auto 0; padding: 48px 0; }
+
+/* En-tête : logo + nom, comme dans l'app */
+.top-bar { display: flex; align-items: center; justify-content: space-between; }
+.brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--background); }
+.brand img { width: 52px; height: 52px; display: block; border: 2.5px solid var(--background); border-radius: 14px; }
+.brand span { font-family: var(--title); font-weight: 700; font-size: 30px; letter-spacing: -0.6px; }
+
+.lang {
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+  color: var(--background);
+  background: transparent;
+  border: 1.5px solid var(--background);
+  border-radius: 12px;
+  min-width: 44px;
+  height: 44px;
+  cursor: pointer;
+}
+.lang:hover { background: var(--background); color: var(--lime); }
+
+h1 {
+  margin-top: 48px;
+  font-family: var(--title);
+  font-weight: 700;
+  font-size: 52px;
+  line-height: 1.02;
+  letter-spacing: -1.5px;
+}
+h1 em { font-style: normal; color: var(--lime); }
+
+/* Apparition du titre, ligne par ligne */
+h1 .l {
+  display: block;
+  opacity: 0;
+  transform: translateY(24px);
+  animation: monte .7s cubic-bezier(.2, .8, .2, 1) forwards;
+}
+h1 .l:nth-child(2) { animation-delay: .35s; }
+@keyframes monte { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  h1 .l { animation: none; opacity: 1; transform: none; }
+}
+
+.intro { margin-top: 20px; font-size: 16px; line-height: 24px; color: var(--text-secondary); }
+
+.rules {
+  margin-top: 28px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 18px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-secondary);
+}
+.rules strong { color: var(--text); font-weight: 600; }
+
+/* Bouton principal — PrimaryButton.tsx : 56 px, rayon 16, lime, Space Grotesk 18 */
+.actions { display: flex; flex-direction: column; gap: 16px; }
+.primary {
+  height: 56px;
+  border-radius: 16px;
+  background: var(--background);
+  color: var(--lime);
+  font-family: var(--title);
+  font-weight: 700;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  transition: opacity .15s ease;
+}
+.primary:active { opacity: 0.8; }
+.primary.soon {
+  background: transparent;
+  color: var(--background);
+  border: 2px solid var(--background);
+  pointer-events: none;
+}
+.primary svg { width: 20px; height: 20px; }
+
+.footnote { text-align: center; font-size: 12.5px; color: var(--text-muted); }
+
+footer {
+  border-top: 1px solid rgba(17, 17, 19, 0.2);
+  padding: 20px 24px 28px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 16px;
+  font-size: 13px;
+}
+footer[hidden] { display: none; }
+footer a { color: var(--background); opacity: 0.7; text-decoration: none; }
+footer a:hover { opacity: 1; text-decoration: underline; }
+
+@media (min-width: 720px) {
+  main { padding-top: 72px; }
+  h1 { font-size: 64px; letter-spacing: -2.5px; }
+}
