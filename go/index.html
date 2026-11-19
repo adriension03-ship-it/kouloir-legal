@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Kouloir</title>
+<script src="../config.js"></script>
+<script>
+  /* Cible du QR code des flyers : kouloir.fr/go
+     iPhone + app publiée → App Store. Sinon → page d'accueil. */
+  (function () {
+    var k = window.KOULOIR || {};
+    var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+                (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    window.location.replace((k.LIVE && isIOS) ? k.APP_URL : "../?src=flyer");
+  })();
+</script>
+</head>
+<body style="background:linear-gradient(160deg,#C6FF3D,#9BF04A 55%,#4FD27A);margin:0">
+<noscript><a href="../" style="color:#111113;font-family:sans-serif">kouloir.fr</a></noscript>
+</body>
+</html>
