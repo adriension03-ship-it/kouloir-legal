@@ -5,6 +5,6 @@
  */
 window.KOULOIR = {
   APP_ID: "6836880559",
-  LIVE: false
+  LIVE: true
 };
-window.KOULOIR.APP_URL = "https://apps.apple.com/fr/app/id" + window.KOULOIR.APP_ID;
+window.KOULOIR.APP_URL = "https://apps.apple.com/fr/app/kouloir/id" + window.KOULOIR.APP_ID;
